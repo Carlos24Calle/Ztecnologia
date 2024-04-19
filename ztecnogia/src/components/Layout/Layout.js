@@ -42,13 +42,13 @@ const Layout = () => {
             <Link to="/cotizaciones">Cotizaciones</Link>
           </li>
           <li className='my-3 text-lg'>
-            <Link to="/Clients">Clientes</Link>
+            <Link to="/clientes">Clientes</Link>
           </li>
           <li className='my-3 text-lg'>
-            <Link to="/Products">Productos</Link>
+            <Link to="/Productos">Productos</Link>
           </li>
           <li className='my-3 text-lg'>
-            <Link to="/Users">Usuarios</Link>
+            <Link to="/usuarios">Usuarios</Link>
           </li>
           </Permisions>
                <Permisions> 

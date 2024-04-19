@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { post } from "../../httprequeset/httprequeset";
+import { postAuth, get } from "../../httprequeset/httprequeset";
 import Swal from "sweetalert2";
 
-const ProducsForm = () => {
+const ProductsForm = () => {
   const {
     register,
     formState: { errors },
@@ -30,7 +30,7 @@ const ProducsForm = () => {
   };
   const onSubmit = (data) => {
     console.log("dataform", data);
-    post(`${url}/product/create`, data, cbResponse);
+    postAuth(`${url}/product/create`, data, cbResponse);
   };
   return (
     <div className="flex justify-center items-center h-full">
@@ -45,7 +45,7 @@ const ProducsForm = () => {
             htmlFor="refe"
             className="block text-sm font-medium text-gray-700"
           >
-           Referencia
+            Referencia
           </label>
           <input
             id="ref"
@@ -66,7 +66,7 @@ const ProducsForm = () => {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-          Nombre
+            Nombre
           </label>
           <input
             id="name"
@@ -74,14 +74,11 @@ const ProducsForm = () => {
             className="mt-1 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-blue-500"
             {...register("name", {
               required: "El nombre es requerido",
-            
             })}
             placeholder="Nombre"
           />
           {errors.name && (
-            <span className="text-red-500 text-sm">
-              {errors.name.message}
-            </span>
+            <span className="text-red-500 text-sm">{errors.name.message}</span>
           )}
         </div>
 
@@ -97,7 +94,9 @@ const ProducsForm = () => {
               id="brand"
               type="text"
               className="mt-1 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-blue-500"
-              {...register("brand", { required: "Registrar marca del producto" })}
+              {...register("brand", {
+                required: "Registrar marca del producto",
+              })}
               placeholder="Marca"
             />
             {errors.brand && (
@@ -150,21 +149,14 @@ const ProducsForm = () => {
         </div>
 
         <div className="mb-4">
-          <label
-            htmlFor=""
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="" className="block text-sm font-medium text-gray-700">
             Descuento
           </label>
           <input
-            
             className="mt-1 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-blue-500"
-            {...register("discount_price", )}
+            {...register("discount_price")}
             placeholder="discount_price"
           />
-          
-            
-          
         </div>
 
         <button
@@ -178,4 +170,4 @@ const ProducsForm = () => {
   );
 };
 
-export default ProducsForm
+export default ProductsForm;

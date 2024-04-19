@@ -5,10 +5,11 @@ import Swal from "sweetalert2";
 import { currencyFormatNumber, url } from "../../utilils/common-functions";
 
 const QuetosForm = () => {
-  const [amount_product, setAmountProduct] = useState(1);
+  const [amountProduct, setAmountProduct] = useState(1);
   const [productList, setProductList] = useState([]);
   const [newItem, setNewItem] = useState({});
   const [itemsProducts, setItemsProducts] = useState([]);
+  const [sendProducts, setSendProducts] = useState([]);
 
   const {
     register,
@@ -44,43 +45,53 @@ const QuetosForm = () => {
 
       setValue('product', {
           price: currencyFormatNumber(option.price),
-          subtotal: currencyFormatNumber(option.price * amount_product)
+          subtotal: currencyFormatNumber(option.price * amountProduct)
       })
     }
   };
 
   const addItemProduct = () => {
-    // const newItemParse = {
-    //     id: newItem.id,
-    //     ref: newItem.ref,
-    //     name: newItem.name,
-    //     price: newItem.price,
-    //     amount: amountProduct,
-    //     subtotal: newItem.price * amountProduct
-    // }
+    const newItemParse = {
+        id: newItem.id,
+        ref: newItem.ref,
+        name: newItem.name,
+        price: newItem.price,
+        amount: amountProduct,
+        subtotal: newItem.price * amountProduct
+    }
     // Actualizamos el estado del arreglo agregando el nuevo item al arreglo existente
-    setItemsProducts([...itemsProducts, newItem]);
+    setItemsProducts([...itemsProducts, newItemParse]);
+    setSendProducts([...sendProducts, {product_id: newItem.id, amount_product: amountProduct}]);
   };
-  console.log("itemsProducts", itemsProducts);
+  
+  const cbResponseQuetos = (response) => {
+    if (response.status === 201) {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Queto creado con éxito",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocurrió un error, inténtalo nuevamente",
+      });
+    }    
+  }
+
   const onSubmit = async (data) => {
     try {
-      const response = await postAuth(`${url}/queto/create`, data);
-      console.log(response);
-      if (response === "Cotizacion ya esta registrada") {
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Queto creado con éxito",
-          showConfirmButton: false,
-          timer: 3000,
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Ocurrió un error, inténtalo nuevamente",
-        });
-      }
+      const parseData = {
+        queto_number: data.queto_number,
+        expiration_queto: data.expiration_queto,
+        user_id: data.user_id,
+        client_id: data.client_id,
+        products: sendProducts
+      } 
+      await postAuth(`${url}/queto/create`, parseData, cbResponseQuetos);
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -90,19 +101,6 @@ const QuetosForm = () => {
       });
     }
   };
-
-  const handleAddProduct = () => {
-    const products = watch("products");
-    products.push({ product_id: "", amount_product: "" });
-    setValue("products", products);
-  };
-
-  const handleRemoveProduct = (index) => {
-    const products = watch("products");
-    products.splice(index, 1);
-    setValue("products", products);
-  };
-
   return (
     <div>
       <form
@@ -201,53 +199,6 @@ const QuetosForm = () => {
             )}
           </div>
         </div>
-        {/* 
-        {watch("products").map((product, index) => (
-          <div key={index} className="mb-4">
-            <label
-              htmlFor={`products[${index}].product_id`}
-              className="block text-sm font-medium text-gray-700"
-            > */}
-        {/* Producto {index + 1}
-            // </label>
-            <input
-              type="text"
-              placeholder="ID del producto"
-              {...register(`products[${index}].product_id`, {
-                required: "Ingresa el ID del producto",
-              })}
-            />
-            {errors.products && errors.products[index]?.product_id && (
-              <span className="text-red-500 text-sm">
-                {errors.products[index].product_id.message}
-              </span>
-            )}
-
-            <input
-              type="text"
-              placeholder="Cantidad"
-              {...register(`products[${index}].amount_product`, {
-                required: "Ingresa la cantidad",
-              })}
-            />
-            {errors.products && errors.products[index]?.amount_product && (
-              <span className="text-red-500 text-sm">
-                {errors.products[index].amount_product.message}
-              </span>
-            )} */}
-
-        {/* <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => handleRemoveProduct(index)}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md mr-2"
-              >
-                Eliminar Producto
-              </button>
-            </div>
-          </div>
-        ))} */}
-
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label
@@ -306,7 +257,7 @@ const QuetosForm = () => {
               id="amount"
               type="number"
               className="mt-1 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-blue-500"
-              value={amount_product}  {...register("amount", { required: "La cantidad es requerido" })} onChange={(e) => setAmountProduct(e.target.value)}
+              value={amountProduct} {...register("amount", { required: "La cantidad es requerido" })} onChange={(e) => setAmountProduct(e.target.value)}
               placeholder="Cantidad"
             />
             {errors.amount && (
